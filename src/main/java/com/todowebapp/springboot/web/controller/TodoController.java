@@ -19,13 +19,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.todowebapp.springboot.web.model.Todo;
+import com.todowebapp.springboot.web.service.TodoRepository;
 import com.todowebapp.springboot.web.service.TodoService;
 
 
 @Controller
 public class TodoController {
 	@Autowired
-	TodoService service;
+	TodoRepository repository;
 	
 	@InitBinder
 	public void initBinder(WebDataBinder binder)
@@ -39,8 +40,8 @@ public class TodoController {
    public String showTodosList(ModelMap model)
    {
 		String name = getLoggedinUserName();
-		model.put("name", getLoggedinUserName());
-	   model.put("todos", service.retrieveTodos(name));
+		model.put("todos", repository.findByuser(name));
+		   //model.put("todos", service.retrieveTodos(name));
 	   return "list-todos";
    }
 	@RequestMapping(value="/add-todo", method= RequestMethod.GET)
@@ -57,7 +58,10 @@ public class TodoController {
 			return "todo";
 		}
 			String name = getLoggedinUserName();
-			service.addTodo(name, todo.getDesc(), todo.getTargetDate(), false);
+			todo.setUser(name);
+			repository.save(todo);
+				
+			//service.addTodo(name, todo.getDesc(), todo.getTargetDate(), false);
 			return "redirect:/list-todos";
 	   }
 
@@ -73,13 +77,15 @@ public class TodoController {
 	   {
 		if(id==1)
 			throw new RuntimeException("Something is wrong");
-			service.deleteTodo(id);
+		    repository.deleteById(id);
+		    //service.deleteTodo(id);
 			return "redirect:/list-todos";
 	   }
 	@RequestMapping(value="/update-todo", method= RequestMethod.GET)
 	   public String showUpdateTodoPage(@RequestParam int id, ModelMap model)
 	   {
-			Todo todo=service.retrieveTodo(id);
+			//Todo todo=service.retrieveTodo(id);
+		    Todo todo=repository.findById(id).get();
 			model.put("todo",todo);
 			return "todo";
 	   }
@@ -94,7 +100,8 @@ public class TodoController {
 		    
 		    todo.setUser(getLoggedinUserName());
 		    
-			service.updateTodo(todo);
+		    repository.save(todo);
+		    //service.updateTodo(todo);
 			
 			return "redirect:/list-todos";
 	   }

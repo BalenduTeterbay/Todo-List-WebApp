@@ -2,10 +2,17 @@ package com.todowebapp.springboot.web.model;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
+@Entity
 public class Todo {
-    private int id;
+    
+	@Id
+	@GeneratedValue
+	private int id;
     private String user;
     
     @Size(min=10, message="Enter atleast 10 Characterss")
@@ -92,7 +99,7 @@ public class Todo {
     @Override
     public String toString() {
         return String.format(
-                "Todo [id=%s, user=%s, desc=%s, targetDate=%s, isDone=%s]", id,
+                "Todo [id=%s, user=%s, desc=%s, targetDate=%s]", id,
                 user, desc, targetDate);
     }
 
